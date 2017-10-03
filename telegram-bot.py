@@ -82,7 +82,7 @@ try:
 	requrl = 'https://api.telegram.org/bot' + str(json_conf['token']) + '/sendMessage'
 	payload = {
 		'chat_id' 		: str(chat_id).encode('utf-8'),
-		'text' 			: message_text.decode('string_escape').encode('utf-8')
+		'text' 			: message_text.decode('string-escape')
 	}
 
 	if (len(parse_mode) > 3):
