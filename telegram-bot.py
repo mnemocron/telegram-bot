@@ -22,6 +22,9 @@ except Exception as e:
 	print >> sys.stderr, e
 	sys.exit(1)
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 parser = optparse.OptionParser('telegram-bot')
 parser.add_option('-u', '-c', '--user', '--chat', 	dest='chat', 		type='string', help='specify the recipent')
 parser.add_option('-t', '--text',					dest='text', 		type='string', help='specify the text to be sent')
@@ -82,7 +85,7 @@ try:
 	requrl = 'https://api.telegram.org/bot' + str(json_conf['token']) + '/sendMessage'
 	payload = {
 		'chat_id' 		: str(chat_id).encode('utf-8'),
-		'text' 			: message_text.decode('string-escape')
+		'text' 			: message_text.decode('string-escape').encode('utf-8')
 	}
 
 	if (len(parse_mode) > 3):
