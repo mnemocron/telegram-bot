@@ -16,7 +16,7 @@ and install a copy of the `telegram-bot.py` under `/usr/bin`.
 In order to send messages from the bot, a user has to contact the bot first.
 Search your bot on Telegram and send the message "_Add me_".
 
-Now run `$ sudo add-new-user.py`.
+Now run `$ sudo python add-new-user.py`.
 This script will see the new users and will prompt you if you want to add them to the configuration file.
 
 ## Sending Messages
