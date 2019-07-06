@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #_*_ coding: utf-8 _*_
 
 '''
@@ -16,27 +16,26 @@ try:
 	import requests					# requesting webpages
 	import json 					# parsing API response and conf file
 except Exception as e:
-	print >> sys.stderr, 'Error importing modules'
-	print >> sys.stderr, e
+	sys.stderr.write('Error importing modules')
+	sys.stderr.write(str(e))
 	sys.exit(1)
 
 # check root privileges
 try:
 	os.mkdir(CONF_DIRECTORY + '/test')
 	os.rmdir(CONF_DIRECTORY + '/test')
-except OSError as e:
-	if (e[0] == errno.EACCES):
-		print >> sys.stderr, 'You need root permissions to do this!'
-		sys.exit(1)
+except PermissionError as e:
+	sys.stderr.write('You need root permissions to do this!')
+	sys.exit(1)
 
 try:
 	with open(CONF_DIRECTORY + '/telegram-bot.conf', 'r') as conf_file:
 		json_conf_old = json.loads(conf_file.read())
-except IOError as e:
-	if (e[0] == 2) :
-		print >> sys.stderr, 'No conf file found in ' + CONF_DIRECTORY
-		sys.exit(1)
-	print >> sys.stderr, 'Error opening configuration file'
+except FileNotFoundError as e:
+	sys.stderr.write('No conf file found in ' + CONF_DIRECTORY)
+	sys.exit(1)
+except Exception as e:
+	sys.stderr.write('Error opening configuration file')
 	sys.exit(1)
 
 # create new configuration object
@@ -88,7 +87,7 @@ def query_yes_no(question, default='no'):
 
 	while True:
 		sys.stdout.write(question + prompt)
-		choice = raw_input().lower()
+		choice = input().lower()
 		if default is not None and choice == '':
 			return valid[default]
 		elif choice in valid:
@@ -115,7 +114,7 @@ def add_new(user):
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['last_name'] 	= ''
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['id']			= user['message']['chat']['id']
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['type']			= 'group'
-			print '[info] - added new group: ' + user['message']['chat']['title']
+			print('[info] - added new group: ' + user['message']['chat']['title'])
 		else:
 			json_conf_new['chats'].append({})
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['username'] 		= user['message']['from']['username']
@@ -123,7 +122,7 @@ def add_new(user):
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['last_name'] 	= user['message']['from']['last_name']
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['id']			= user['message']['from']['id']
 			json_conf_new['chats'][len(json_conf_new['chats']) -1]['type']			= 'private'
-			print '[info] - added new chat: ' + user['message']['from']['username']
+			print('[info] - added new chat: ' + user['message']['from']['username'])
 
 # looking up new messages
 requrl = 'https://api.telegram.org/bot' + str(json_conf_old['token']) + '/getUpdates'
@@ -149,7 +148,7 @@ if (response.status_code == 200):
 
 else:
 	json_response = json.loads(response.text)
-	print str(json_response['error_code']) + ' - ' + json_response['description']
+	print(str(json_response['error_code']) + ' - ' + json_response['description'])
 
 print ('[info] - writing changes to ' + CONF_DIRECTORY + '/telegram-bot.conf')
 with open(CONF_DIRECTORY + '/telegram-bot.conf', 'w') as conf_file:

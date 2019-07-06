@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #_*_ coding: utf-8 _*_
 
 '''
@@ -18,12 +18,12 @@ try:
 	import optparse					# argument parser
 	import select					# stdin input
 except Exception as e:
-	print >> sys.stderr, 'Error importing modules'
-	print >> sys.stderr, e
+	sys.stderr.write('Error importing modules')
+	sys.stderr.write(e)
 	sys.exit(1)
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 parser = optparse.OptionParser('telegram-bot')
 parser.add_option('-u', '-c', '--user', '--chat', 	dest='chat', 		type='string', help='specify the recipent')
@@ -39,7 +39,7 @@ if ( opts.chat is None ):
 	sys.exit(1)
 
 if ( opts.text is None and opts.stdin is None ):
-	print >> sys.stderr, 'Please specify something to send (--text or --stdin).'
+	sys.stderr.write('Please specify something to send (--text or --stdin).')
 	sys.exit(1)
 
 try:
@@ -49,9 +49,9 @@ try:
 			json_conf = json.loads(conf_file.read())
 	except IOError as e:
 		if (e[0] == 2) :
-			print >> sys.stderr, 'No conf file found in ' + CONF_DIRECTORY
+			sys.stderr.write('No conf file found in ' + CONF_DIRECTORY)
 			sys.exit(1)
-		print >> sys.stderr, 'Error opening configuration file'
+		sys.stderr.write('Error opening configuration file')
 		sys.exit(1)
 
 	chat_id = []
@@ -60,7 +60,7 @@ try:
 			chat_id = user['id']
 
 	if (len(str(chat_id)) < 3):
-		print >> sys.stderr, 'User not found: ' + opts.chat
+		sys.stderr.write('User not found: ' + opts.chat)
 		sys.exit(1)
 
 	message_text = ''
@@ -79,14 +79,16 @@ try:
 		elif (opts.parsemode.lower() == 'markdown'):
 			parse_mode = 'markdown'
 		else:
-			print >> sys.stderr, 'Unsupported parse mode: ' + opts.parsemode
+			sys.stderr.write('Unsupported parse mode: ' + opts.parsemode)
 			sys.exit(1)
 
 	requrl = 'https://api.telegram.org/bot' + str(json_conf['token']) + '/sendMessage'
 	payload = {
 		'chat_id' 		: str(chat_id).encode('utf-8'),
-		'text' 			: message_text.decode('string-escape').encode('utf-8')
+		'text' 			: message_text.encode('latin1').decode('unicode-escape').encode('utf-8')
 	}
+    # need to decode escaped sequences for \n
+    # https://stackoverflow.com/a/14820462
 
 	if (len(parse_mode) > 3):
 		payload['parse_mode'] = parse_mode.encode('utf-8')
@@ -99,7 +101,7 @@ try:
 
 	response = requests.post(requrl, data=payload)
 
-	if (response.status_code is not 200):
+	if (response.status_code != 200):
 		print (response.text)
 
 except KeyboardInterrupt:
