@@ -27,7 +27,7 @@ Send a simple message like this:
 
 Pipe text from `stdin`:
 
-`$ echo "Hello, World!" | telegram-bot -u @username -p`
+`$ echo "Hello, World!" | telegram-bot -u @username`
 
 ### Styling
 
